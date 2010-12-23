@@ -8,16 +8,32 @@ type File() =
   let enties = Array.zeroCreate 500
   member f.Parse() = "a"
 
-[<Struct>]
-type Entry =
-  val FirstRow : string
-  val SecondRow : string
-  val ThirdRow : string
-  val FourthRow : string
-  new (first,second,third)={ FirstRow = first; SecondRow = second; ThirdRow = third; FourthRow = "" }
-  new (first,second,third,fourth)={ FirstRow = first; SecondRow = second; ThirdRow = third; FourthRow = fourth }
-  member e.Parse()=123456789 
+type Entry() =
+  let rec parseDigit (f:string,s:string,t:string,current:int) =
+    if current > 27 then
+      printfn "then %d" current 
+    else
+      let fd = new System.Text.StringBuilder()
+      fd.Append(f.[current])
+      fd.Append(f.[current+1])
+      fd.Append(f.[current+2])
+      let sd = new System.Text.StringBuilder()
+      sd.Append(s.[current])
+      sd.Append(s.[current+1])
+      sd.Append(s.[current+2])
+      let td = new System.Text.StringBuilder()
+      td.Append(t.[current])
+      td.Append(t.[current+1])
+      td.Append(t.[current+2])
+      printfn "%s" (fd.ToString())
+      printfn "%s" (sd.ToString())
+      printfn "%s" (td.ToString())
 
+
+//        Digit digit = new Digit()
+//        let entry = String.Concat(parseDigit (f,s,t, (current + 3)), digit.parse(frd,srd,trd))
+      parseDigit(f,s,t,current + 3)
+  member e.parse(f,s,t) = parseDigit (f,s,t,0)
 
 type Digit()=
   member d.parse(f,s,t) =
