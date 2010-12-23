@@ -22,13 +22,13 @@ type EntryTest() =
   member et.ParseTest123456789() = 
     //let entry = new Entry("  _  _     _  _  _  _  _ ","| _| _||_||_ |_   ||_||_|","||_  _|  | _||_|  ||_| _|")
     let entry = new Entry()
-    Assert.AreEqual(123456789,entry.parse("  _  _     _  _  _  _  _ ","| _| _||_||_ |_   ||_||_|","||_  _|  | _||_|  ||_| _|"))
+    Assert.AreEqual("123456789",entry.parse("    _  _     _  _  _  _  _ "," |  _| _||_||_ |_   ||_||_|"," | |_  _|  | _||_|  ||_| _|"))
   
   [<Test>]
   member et.ParseTest023456789()= 
     //let entry = new Entry(" _  _  _     _  _  _  _  _ ","| | _| _||_||_ |_   ||_||_|","|_||_  _|  | _||_|  ||_| _|")
     let entry = new Entry()
-    Assert.AreEqual(023456789,entry.parse(" _  _  _     _  _  _  _  _ ","| | _| _||_||_ |_   ||_||_|","|_||_  _|  | _||_|  ||_| _|"))
+    Assert.AreEqual("023456789",entry.parse(" _  _  _     _  _  _  _  _ ","| | _| _||_||_ |_   ||_||_|","|_||_  _|  | _||_|  ||_| _|"))
 
 [<TestFixture>]
 type DigitTest()=
