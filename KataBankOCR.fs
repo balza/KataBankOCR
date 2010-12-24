@@ -33,6 +33,6 @@ type Entry() =
       let sd = s.[current .. current+2] 
       let td = t.[current .. current+2]
       let digit = new Digit()
-      let entry = String.Concat(e, digit.parse(fd.ToString(),sd.ToString(),td.ToString()))
+      let entry = String.Concat(e, digit.parse(fd, sd, td))
       parseDigit(f,s,t,current + 3, entry)
-  member e.parse(f,s,t) = parseDigit (f,s,t,0,"")
+  member e.parse(f,s,t) = parseDigit (f, s, t, 0, "")
