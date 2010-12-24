@@ -29,18 +29,9 @@ type Entry() =
     if current > 26 then
       e
     else
-      let fd = new System.Text.StringBuilder()
-      fd.Append(f.[current])
-      fd.Append(f.[current+1])
-      fd.Append(f.[current+2])
-      let sd = new System.Text.StringBuilder()
-      sd.Append(s.[current])
-      sd.Append(s.[current+1])
-      sd.Append(s.[current+2])
-      let td = new System.Text.StringBuilder()
-      td.Append(t.[current])
-      td.Append(t.[current+1])
-      td.Append(t.[current+2])
+      let fd = f.[current .. current+2] 
+      let sd = s.[current .. current+2] 
+      let td = t.[current .. current+2]
       let digit = new Digit()
       let entry = String.Concat(e, digit.parse(fd.ToString(),sd.ToString(),td.ToString()))
       parseDigit(f,s,t,current + 3, entry)
