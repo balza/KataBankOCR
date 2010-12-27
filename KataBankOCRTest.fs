@@ -14,7 +14,17 @@ type FileTest() =
   member ft.TestFixtureSetUp () = file <- File()
 
   [<Test>]
-  member ft.ParseTest () =  Assert.AreEqual("a", file.Parse())
+  ///Test the file testfile.txt with 1 account
+  member ft.ParseTest1 () =  
+    let fileName =  @"testfile.txt"
+    Assert.AreEqual("123456789\n", file.parse(fileName))
+
+  [<Test>]
+  ///Test the file testfile2.txt with 2 accounts
+  member ft.ParseTest2 () =
+    printfn "ft.ParseTest2"
+    let fileName =  @"testfile2.txt"
+    Assert.AreEqual("123456789\n123456789\n", file.parse(fileName))
 
 [<TestFixture>]
 type EntryTest() =
