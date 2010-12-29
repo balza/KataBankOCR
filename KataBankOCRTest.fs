@@ -91,3 +91,10 @@ type DigitTest()=
   member dt.parse9()=
     let digit = new Digit()
     Assert.AreEqual(9,digit.parse(" _ ","|_|"," _|"))
+
+[<TestFixture>]
+  type ChecksumTest()=
+   [<Test>]
+   member cst.parseTest345882865()=
+     let checksum = new Checksum()
+     Assert.IsTrue(checksum.validate("345882865") )

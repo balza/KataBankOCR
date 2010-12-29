@@ -5,6 +5,22 @@ namespace KataBanlOCR
 open System
 open System.IO
 
+type Checksum() =
+  member cs.validate(account:string)=
+   let rec checksumValue (pos:int,result:int):int =
+     let maxCount = account.Length - 1
+     if pos > 0 then
+       result
+     else
+       checksumValue(pos - 1, result + Convert.ToInt32(Char.ToString(account.[pos])) * (pos - 1) )
+   let mutable rem = 0
+   let csv = checksumValue(account.Length,0)
+   let quotient = Math.DivRem(csv,11,&rem)
+   if rem = 0 then
+     true
+   else
+     false
+
 type Digit()= 
   member d.parse(f,s,t) =
     match (f,s,t) with
@@ -55,6 +71,9 @@ type File() =
      printfn "%i" s3.Length
      parseLine(streamReader, result + entry.parse(s1,s2,s3) + "\n")
    else
+     let checksum = new Checksum()
+     if checksum.validate(result)=false then 
+      raise(System.Exception("bad stuff happened"))
      result
 
   member f.parse(fileName:string) = 
