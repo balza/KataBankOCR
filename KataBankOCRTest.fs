@@ -1,5 +1,5 @@
 #light
-namespace KataBanlOCR
+namespace KataBankOCR
 
 open System
 open NUnit.Framework
@@ -15,7 +15,8 @@ type FileTest() =
 
   [<Test>]
   ///Test the file testfile.txt with 1 account
-  member ft.ParseTest1 () =  
+  member ft.ParseTest1 () = 
+    printfn "ParseTest1" 
     let fileName =  @"testfile.txt"
     Assert.AreEqual("123456789\n", file.parse(fileName))
 
@@ -29,72 +30,41 @@ type FileTest() =
 [<TestFixture>]
 type EntryTest() =
   [<Test>]
-  member et.ParseTest123456789() = 
-    //let entry = new Entry("  _  _     _  _  _  _  _ ","| _| _||_||_ |_   ||_||_|","||_  _|  | _||_|  ||_| _|")
+  member et.ParseTest000000000() =
+    printfn "ParseTest000000000"
     let entry = new Entry()
-    Assert.AreEqual("123456789",entry.parse("    _  _     _  _  _  _  _ "," |  _| _||_||_ |_   ||_||_|"," | |_  _|  | _||_|  ||_| _|"))
+    Assert.AreEqual("000000000",entry.parse(" _  _  _  _  _  _  _  _  _ ",
+                                            "| || || || || || || || || |",
+                                            "|_||_||_||_||_||_||_||_||_|"))
+  [<Test>]
+  member et.ParseTest123456789() = 
+    let entry = new Entry()
+    Assert.AreEqual("123456789",entry.parse("    _  _     _  _  _  _  _ ",
+                                            " |  _| _||_||_ |_   ||_||_|",
+                                            " | |_  _|  | _||_|  ||_| _|"))
   
   [<Test>]
-  member et.ParseTest023456789()= 
-    //let entry = new Entry(" _  _  _     _  _  _  _  _ ","| | _| _||_||_ |_   ||_||_|","|_||_  _|  | _||_|  ||_| _|")
+  member et.ParseTest023456789ChecksumFail()= 
     let entry = new Entry()
-    Assert.AreEqual("023456789",entry.parse(" _  _  _     _  _  _  _  _ ","| | _| _||_||_ |_   ||_||_|","|_||_  _|  | _||_|  ||_| _|"))
-
-[<TestFixture>]
-type DigitTest()=
-  [<Test>]
-  member dt.parse0()=
-    let digit = new Digit()
-    Assert.AreEqual(0,digit.parse(" _ ","| |","|_|"))
+    Assert.AreEqual("023456789 ERR",entry.parse(" _  _  _     _  _  _  _  _ ",
+                                                "| | _| _||_||_ |_   ||_||_|",
+                                                "|_||_  _|  | _||_|  ||_| _|"))
 
   [<Test>]
-  member dt.parse1()=
-    let digit = new Digit()
-    Assert.AreEqual(1,digit.parse("   "," | "," | "))
-
-  [<Test>]
-  member dt.parse2()=
-    let digit = new Digit()
-    Assert.AreEqual(2,digit.parse(" _ "," _|","|_ "))
-
-  [<Test>]
-  member dt.parse3()=
-    let digit = new Digit()
-    Assert.AreEqual(3,digit.parse(" _ "," _|"," _|"))
-
-  [<Test>]
-  member dt.parse4()=
-    let digit = new Digit()
-    Assert.AreEqual(4,digit.parse("   ","|_|","  |"))
-
-  [<Test>]
-  member dt.parse5()=
-    let digit = new Digit()
-    Assert.AreEqual(5,digit.parse(" _ ","|_ "," _|"))
-
-  [<Test>]
-  member dt.parse6()=
-    let digit = new Digit()
-    Assert.AreEqual(6,digit.parse(" _ ","|_ ","|_|"))
-
-  [<Test>]
-  member dt.parse7()=
-    let digit = new Digit()
-    Assert.AreEqual(7,digit.parse(" _ ","  |","  |"))
-
-  [<Test>]
-  member dt.parse8()=
-    let digit = new Digit()
-    Assert.AreEqual(8,digit.parse(" _ ","|_|","|_|"))
-
-  [<Test>]
-  member dt.parse9()=
-    let digit = new Digit()
-    Assert.AreEqual(9,digit.parse(" _ ","|_|"," _|"))
-
+  member et.ParseTest02345678IllegalDigit()=
+    printfn "ParseTest02345678IllegalDigit"
+    let entry = new Entry()
+    Assert.AreEqual("02345678? ILL",entry.parse(" _  _  _     _  _  _  _  _ ",
+                                                "| | _| _||_||_ |_   ||_||_|",
+                                                "|_||_  _|  | _||_|  ||_|  |"))
 [<TestFixture>]
   type ChecksumTest()=
    [<Test>]
-   member cst.parseTest345882865()=
+   member cst.parseTestOK()=
      let checksum = new Checksum()
-     Assert.IsTrue(checksum.validate("345882865") )
+     Assert.IsTrue(checksum.validate("457508000"))
+
+   [<Test>]
+   member cst.parseTestFail()=
+     let checksum = new Checksum()
+     Assert.IsFalse(checksum.validate("123456788"))

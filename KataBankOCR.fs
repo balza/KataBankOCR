@@ -1,62 +1,85 @@
 #light
 /// Code Kata 1: http://codingdojo.org/cgi-bin/wiki.pl?KataBankOCR
-namespace KataBanlOCR
+namespace KataBankOCR
 
 open System
 open System.IO
 
+exception DigitException of string
+
 type Checksum() =
   member cs.validate(account:string)=
    let rec checksumValue (pos:int,result:int):int =
-     let maxCount = account.Length - 1
-     if pos > 0 then
+     if pos < 0 then
        result
      else
-       checksumValue(pos - 1, result + Convert.ToInt32(Char.ToString(account.[pos])) * (pos - 1) )
+       let result = result + Convert.ToInt32(Char.ToString(account.[pos])) * (account.Length - pos)
+       let pos = pos - 1 
+       checksumValue(pos, result)
    let mutable rem = 0
-   let csv = checksumValue(account.Length,0)
+   let csv = checksumValue(account.Length - 1,0)
    let quotient = Math.DivRem(csv,11,&rem)
-   if rem = 0 then
-     true
+   if rem <> 0 then
+    false
    else
-     false
-
-type Digit()= 
-  member d.parse(f,s,t) =
-    match (f,s,t) with
-    |(" _ ","| |","|_|") -> 0
-    |("   "," | "," | ") -> 1
-    |(" _ "," _|","|_ ") -> 2
-    |(" _ "," _|"," _|") -> 3
-    |("   ","|_|","  |") -> 4
-    |(" _ ","|_ "," _|") -> 5
-    |(" _ ","|_ ","|_|") -> 6
-    |(" _ ","  |","  |") -> 7
-    |(" _ ","|_|","|_|") -> 8
-    |(" _ ","|_|"," _|") -> 9
-    |_-> 
-      printfn "%s" f
-      printfn "%s" s
-      printfn "%s" t
-      raise(System.Exception("bad stuff happened"))
-
-
+    true
+   
 type Entry() =
-  let rec parseDigit (f:string, s:string, t:string, current:int, e:string) =
+  let mutable hasErrors = false
+  let parseDigit(f,s,t) =
+    match (f,s,t) with
+    |(" _ ",
+      "| |",
+      "|_|") -> '0'
+    |("   ",
+      " | ",
+      " | ") -> '1'
+    |(" _ ",
+      " _|",
+      "|_ ") -> '2'
+    |(" _ ",
+      " _|",
+      " _|") -> '3'
+    |("   ",
+      "|_|",
+      "  |") -> '4'
+    |(" _ ",
+      "|_ ",
+      " _|") -> '5'
+    |(" _ ",
+      "|_ ",
+      "|_|") -> '6'
+    |(" _ ",
+      "  |",
+      "  |") -> '7'
+    |(" _ ",
+      "|_|",
+      "|_|") -> '8'
+    |(" _ ",
+      "|_|",
+      " _|") -> '9'
+    |_-> 
+      hasErrors <- true
+      '?'
+  let rec parseEntry (f:string, s:string, t:string, current:int, e:string) =
     if current > 26 then
-      e
+      if hasErrors then
+        e + " ILL"
+      else
+        //Is the only way in F#? ... seems quiet imperative :-S
+        let checksum = new Checksum()
+        if checksum.validate(e) then
+          e
+        else
+          e + " ERR" 
     else
       let fd = f.[current .. current+2] 
       let sd = s.[current .. current+2] 
       let td = t.[current .. current+2]
-      printfn "%s %i %i" fd current (current+2)
-      printfn "%s" sd
-      printfn "%s" td 
-      let digit = new Digit()
-      let entry = String.Concat(e, digit.parse(fd, sd, td))
-      parseDigit(f,s,t,current + 3, entry)
+      let entry = String.Concat(e, parseDigit(fd, sd, td))
+      parseEntry(f,s,t,current + 3, entry) 
   member e.parse(f,s,t) = 
-      parseDigit (f, s, t, 0, "")
+      parseEntry(f, s, t, 0, "")
 
 type File() =
   let rec parseLine(streamReader:StreamReader, result:string) =
@@ -66,14 +89,8 @@ type File() =
      let  s3 = streamReader.ReadLine()
      let  s4 = streamReader.ReadLine()
      let entry = new Entry()
-     printfn "%i" s1.Length
-     printfn "%i" s2.Length
-     printfn "%i" s3.Length
      parseLine(streamReader, result + entry.parse(s1,s2,s3) + "\n")
    else
-     let checksum = new Checksum()
-     if checksum.validate(result)=false then 
-      raise(System.Exception("bad stuff happened"))
      result
 
   member f.parse(fileName:string) = 
